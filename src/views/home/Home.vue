@@ -13,6 +13,7 @@
                    @tabClick="tabClick"/>
       <goods-list :goods="showGoods"/>
     </scroll>
+
   </div>
 </template>
 
@@ -106,6 +107,7 @@ export default {
 #home {
   padding-top: 44px;
   height: 100vh;
+  position: relative;
 }
 
 .home-nav {
