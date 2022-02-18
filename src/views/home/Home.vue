@@ -4,7 +4,7 @@
       <div slot="center">购物街</div>
     </nav-bar>
 
-    <scroll class="content">
+    <scroll class="content" ref="scroll">
       <home-swiper :banners="banners"/>
       <recommend-view :recommends="recommends"/>
       <feature-view/>
@@ -14,6 +14,7 @@
       <goods-list :goods="showGoods"/>
     </scroll>
 
+    <back-top @click.native="backClick"/>
   </div>
 </template>
 
@@ -26,6 +27,7 @@ import NavBar from "components/common/navbar/NavBar";
 import TabControl from "components/content/tabControl/TabControl";
 import GoodsList from "components/content/goods/GoodsList";
 import Scroll from "components/common/scroll/Scroll";
+import BackTop from "components/content/backTop/BackTop";
 
 import {getHomeMultidata, getHomeGoods} from "network/home";
 
@@ -38,7 +40,8 @@ export default {
     NavBar,
     TabControl,
     GoodsList,
-    Scroll
+    Scroll,
+    BackTop
   },
   data() {
     return {
@@ -81,6 +84,9 @@ export default {
         case 2:
           this.currentType = 'sell';
       }
+    },
+    backClick() {
+      this.$refs.scroll.scrollTo(0, 0, 500)
     },
 
     /**
