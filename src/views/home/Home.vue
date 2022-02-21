@@ -3,6 +3,11 @@
     <nav-bar class="home-nav">
       <div slot="center">购物街</div>
     </nav-bar>
+    <tab-control class="tab-control"
+                 :titles="['流行', '新款', '精选']"
+                 @tabClick="tabClick"
+                 ref="tabControl1"
+                 v-show="isTabFixed"/>
 
     <scroll class="content"
             ref="scroll"
@@ -10,12 +15,13 @@
             @scroll="contentScroll"
             :pull-up-load="true"
             @pullingUp="loadMore">
-      <home-swiper :banners="banners"/>
+      <home-swiper :banners="banners"
+                   @swiperImageLoad="swiperImageLoad"/>
       <recommend-view :recommends="recommends"/>
       <feature-view/>
-      <tab-control class="tab-control"
-                   :titles="['流行', '新款', '精选']"
-                   @tabClick="tabClick"/>
+      <tab-control :titles="['流行', '新款', '精选']"
+                   @tabClick="tabClick"
+                   ref="tabControl2"/>
       <goods-list :goods="showGoods"/>
     </scroll>
 
@@ -59,7 +65,9 @@ export default {
         'sell': {page: 0, list: []},
       },
       currentType: 'pop',
-      isShowBackTop: false
+      isShowBackTop: false,
+      tabOffsetTop: 0,
+      isTabFixed: false
     }
   },
   computed: {
@@ -78,7 +86,7 @@ export default {
 
   },
   mounted() {
-    // 3.监听item中图片加载完成
+    // 1.监听item中图片加载完成
     const refresh = debounce(this.$refs.scroll.refresh, 500)
     this.$bus.$on('itemImageLoad', () => {
       refresh()
@@ -99,20 +107,26 @@ export default {
         case 2:
           this.currentType = 'sell';
       }
+      this.$refs.tabControl1.currentIndex = index
+      this.$refs.tabControl2.currentIndex = index
     },
     backClick() {
       this.$refs.scroll.scrollTo(0, 0, 500)
     },
     contentScroll(position) {
-      if (-position.y > 1000) {
-        this.isShowBackTop = true
-      } else {
-        this.isShowBackTop = false
-      }
+      // 1.判断是否展示backTop
+      this.isShowBackTop = (-position.y) > 1000
+
+      // 2.监控tabControl是否停留在顶部
+      this.isTabFixed = (-position.y) > this.tabOffsetTop
     },
     loadMore() {
       this.getHomeGoods(this.currentType)
       this.$refs.scroll.finishPullUp()
+    },
+    swiperImageLoad() {
+      // 2.获取tabControl的offsetTop
+      this.tabOffsetTop = this.$refs.tabControl2.$el.offsetTop;
     },
 
     /**
@@ -137,7 +151,7 @@ export default {
 
 <style scoped>
 #home {
-  padding-top: 44px;
+  /*padding-top: 44px;*/
   height: 100vh;
   position: relative;
 }
@@ -146,16 +160,15 @@ export default {
   background-color: var(--color-tint);
   color: #fff;
 
-  position: fixed;
-  left: 0;
-  right: 0;
-  top: 0;
+  /*position: fixed;*/
+  /*left: 0;*/
+  /*right: 0;*/
+  /*top: 0;*/
   z-index: 9;
 }
 
 .tab-control {
-  position: sticky;
-  top: 44px;
+  position: relative;
   z-index: 9;
 }
 
@@ -165,5 +178,7 @@ export default {
   bottom: 49px;
   left: 0;
   right: 0;
+
+  overflow: hidden;
 }
 </style>
