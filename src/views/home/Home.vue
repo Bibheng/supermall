@@ -4,7 +4,12 @@
       <div slot="center">购物街</div>
     </nav-bar>
 
-    <scroll class="content" ref="scroll" :probe-type="3" @scroll="contentScroll">
+    <scroll class="content"
+            ref="scroll"
+            :probe-type="3"
+            @scroll="contentScroll"
+            :pull-up-load="true"
+            @pullingUp="loadMore">
       <home-swiper :banners="banners"/>
       <recommend-view :recommends="recommends"/>
       <feature-view/>
@@ -95,6 +100,10 @@ export default {
       } else {
         this.isShowBackTop = false
       }
+    },
+    loadMore() {
+      this.getHomeGoods(this.currentType)
+      this.$refs.scroll.finishPullUp()
     },
 
     /**
